@@ -58,4 +58,4 @@ For quicker processing or when there is a single directory you can just hardcode
 
 The same can be done to decide where the resulting csv file will be made, simply changing the `output_file_name` variable to the full file path you want to output to. 
 
-
+Run the rest of the notebook and you should be good to go!
