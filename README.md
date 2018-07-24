@@ -4,6 +4,8 @@ ________________________________________________________________________________
 
 ## Introduction and Description
 
+_NOTE: Please familiarise with what Amazon Rekognition is, it's a image and video processing API which uses deeplearning to identify items and objects of videos or images sent to it through AWS services, it returns labels and the confidences those labels apply to the video/image requested._
+
   This repository contains a juptyer notebook which parses JSON files as retrieved by the Amazon Rekognition API and selects the most unique labels above a particular confidence level (adjustable in the notebook itself), by counting the frequency of the labels of the particular directory. 
   
   The ideal way to accomplish this is to dump the AWS Rekognition json files into a particular directory, preferably in a `.txt` file format with the same file name. At the moment of this writing, supported file extensions are `.txt` and `.res` (resource file format). Additional file extensions can be added or removed by tweaking the notebook (at kernels 3 and 4). 
@@ -26,12 +28,34 @@ ________________________________________________________________________________
   
  ## Parsing AWS Rekognition JSON files in a particular directory
  
+ #### Background Information
  The notebook was formatted so it can be run sequentially.
  
  First step is to open the Video Tagger notebook.
  
- Run the first kernel, i.e. `1.- INITIALISATION KERNEL`
+ Run the first kernel, (`1.- INITIALISATION KERNEL`)
  
  Then head down to the following kernel. That will be the customization kernel and there are a few things to consider: 
  
- - Firstly you should familiarise yourself with the JSON format returned by AWS Rekognition, open in a text editor 
+ - You should familiarise yourself with the JSON format returned by AWS Rekognition, open in a text editor like Notepad one of the JSON files in your directory and observe that each video submitted has labels with confidence values as a percentage, corresponding to Rekognition's confidence that label applies to the video submitted. Hence the higher the confidence the higher chance the video contains it.
+  
+  However a problem arises that the API processes redudant labels with equal confidence values, e.g. Human, People, Person and hence rises the necessity of choosing the most descriptive, unique label which is why the algorithm discards the most popular labels. However there is  the compromise of lower confidence values giving wrong labels. Hence it is up to the user to customize those settings and that is exactly what this kernel allows you to do: 
+  
+#### Setting confidence threshold and confidence precision  
+
+Setting the minimum accepted label confidence to be applied for video labelling is very simple, simply change the `confidence_threshold` variable to a floating point number between 0-100 (percentages). The default is set to 75% hence, you should find `confidence_threshold = 75.0`
+
+If you have opened a couple JSON files from your directory, you might have perhaps not noticed that label confidences can differentiate between themselves with very small differences e.g. 0.000001. Hence rounding confidence values to a lower precision can improve video tagging by removing redudancies. By how much is up to the user and the number of decimal places allowed is set by the `conf_decimal_points` variable. The AWS default is 14 decimal places. 
+
+#### Assigning directory file path and output path
+
+Apart from the label filters, the final user required variables is the filepath of the directory containing the JSON files and the name and path of the csv file to be outputted. 
+
+As default the program will prompt you for a path until a valid directory is entered, and the csv file will be labelled `results.csv` and outputted into the same directory. 
+
+For quicker processing or when there is a single directory you can just hardcode the path by altering the following code in kernel 2: 
+`directory_path = GetValidDirectoryPath()` to `directory_path = 'C:/Users/...'`.
+
+The same can be done to decide where the resulting csv file will be made, simply changing the `output_file_name` variable to the full file path you want to output to. 
+
+
